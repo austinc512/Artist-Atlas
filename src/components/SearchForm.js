@@ -20,6 +20,12 @@ function SearchForm() {
   // create paging
   const [offset, setOffset] = useState(0);
 
+  // is having this in this scope bad?
+  // probably
+  // bug: have to refresh page for auth to work correctly
+  // this authToken value isn't read properly when the cookie is updated
+  // if page loads with cookie, it works just fine
+  // will iron out tomorrow
   let cookies = cookie.parse(document.cookie);
   let authToken = cookies.authToken;
 
@@ -72,6 +78,7 @@ function SearchForm() {
             maxAge: 3540, // 59 minutes
           }
         );
+        authToken = response.data.access_token;
       })
       .catch((error) => {
         console.error(error);
