@@ -28,7 +28,7 @@ function AlbumCard({ album }) {
   return (
     <div className="album-card">
       <p className="album-title">
-        <a href={album.external_urls.spotify} target="_blank">
+        <a href={album.external_urls.spotify} target="_blank" rel="noreferrer">
           {formatTitle(album.name)}
         </a>
         {/* <a href={album.external_urls.spotify}>{album.name}</a> */}

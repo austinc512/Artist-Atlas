@@ -22,12 +22,38 @@ function SearchForm() {
 
   // is having this in this scope bad?
   // probably
-  // bug: have to refresh page for auth to work correctly
-  // this authToken value isn't read properly when the cookie is updated
-  // if page loads with cookie, it works just fine
-  // will iron out tomorrow
-  let cookies = cookie.parse(document.cookie);
-  let authToken = cookies.authToken;
+  const [authToken, setAuthToken] = useState(null);
+
+  // Load authToken from cookies on component mount
+  useEffect(() => {
+    const cookies = cookie.parse(document.cookie);
+    setAuthToken(cookies.authToken);
+  }, []);
+
+  const getToken = () => {
+    axios({
+      method: 'post',
+      url: 'https://accounts.spotify.com/api/token',
+      data: data,
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    })
+      .then((response) => {
+        // console.log(response.data.access_token); // turn off in prod
+        // setToken(response.data.access_token); // bad too
+        document.cookie = cookie.serialize(
+          'authToken',
+          response.data.access_token,
+          {
+            path: '/',
+            maxAge: 3540, // 59 minutes
+          }
+        );
+        setAuthToken(response.data.access_token);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
   const handleSubmit = async () => {
     // e.preventDefault();
@@ -59,31 +85,6 @@ function SearchForm() {
       handleSubmit();
     }
   }, [offset]);
-
-  const getToken = () => {
-    axios({
-      method: 'post',
-      url: 'https://accounts.spotify.com/api/token',
-      data: data,
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    })
-      .then((response) => {
-        // console.log(response.data.access_token); // turn off in prod
-        // setToken(response.data.access_token); // bad too
-        document.cookie = cookie.serialize(
-          'authToken',
-          response.data.access_token,
-          {
-            path: '/',
-            maxAge: 3540, // 59 minutes
-          }
-        );
-        authToken = response.data.access_token;
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
 
   useEffect(() => {
     console.log(albums);

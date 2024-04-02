@@ -1,3 +1,7 @@
+html {
+  background-color: #282a35;
+}
+
 .nav {
   background-color: #282a35;
   display: flex;
